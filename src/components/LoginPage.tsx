@@ -163,9 +163,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
-        {/* Quick Help card */}
-        <div className="mt-6 text-center text-xs text-slate-500 space-y-1">
+        {/* Quick Help card & Developer credit */}
+        <div className="mt-6 text-center text-xs text-slate-500 space-y-1.5">
           <p>Experiencing difficulty accessing your assessment? Contact the academy lab coordinator or instructor.</p>
+          <p className="text-slate-600 font-medium text-xs pt-1">
+            Developed by <span className="text-slate-900 font-semibold">Muhammad Abdullahi Muhammad</span>
+          </p>
         </div>
       </div>
     </div>

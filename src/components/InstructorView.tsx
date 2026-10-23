@@ -221,12 +221,22 @@ export const InstructorView: React.FC<InstructorViewProps> = ({ onBackToPortal }
             Cohort C1-2026 Assessment Dashboard
           </h1>
           <p className="text-xs text-slate-500">
-            Systems Administration (Weeks 1–4) · 12 Registered Candidates
+            Systems Administration (Weeks 1–4) · 12 Registered Candidates · Developed by <strong className="text-slate-700">Muhammad Abdullahi Muhammad</strong>
           </p>
         </div>
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/exam-portal.html"
+            download="SkillBridge_Systems_Admin_Exam_Portal.html"
+            className="px-3.5 py-2 rounded-lg bg-[#D4A017] hover:bg-[#A57C0E] text-slate-950 font-semibold text-xs sm:text-sm transition-colors flex items-center gap-1.5 shadow-xs"
+            title="Download full portal as a single offline HTML file"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download Offline HTML App</span>
+          </a>
+
           <button
             onClick={handleDownloadCSV}
             className="px-3.5 py-2 rounded-lg bg-[#0E5C63] hover:bg-[#093E43] text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"

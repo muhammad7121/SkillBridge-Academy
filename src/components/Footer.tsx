@@ -14,6 +14,9 @@ export const Footer: React.FC = () => {
           <span>·</span>
           <span>Cohort C1-2026</span>
         </div>
+        <p className="text-slate-600 font-medium text-xs pt-1">
+          Developed by <span className="text-slate-900 font-semibold">Muhammad Abdullahi Muhammad</span>
+        </p>
       </div>
     </footer>
   );
