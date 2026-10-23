@@ -50,6 +50,7 @@ export const ExamPage: React.FC<ExamPageProps> = ({
   const currentQuestion: ExamQuestion = attempt.questions[currentIndex];
   const totalQuestions = attempt.questions.length;
   const answeredCount = Object.keys(attempt.answers).length;
+  const progressPercent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
   const isFlagged = attempt.flaggedQuestionIds.includes(currentQuestion.id);
   const selectedOption = attempt.answers[currentQuestion.id];
 
@@ -201,12 +202,40 @@ export const ExamPage: React.FC<ExamPageProps> = ({
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-100 h-1">
-          <div
-            className="bg-[#0E5C63] h-1 transition-all duration-300"
-            style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
-          />
+        {/* Visual Progress Bar Section */}
+        <div className="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 lg:px-8 py-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-800">Progress:</span>
+              <span className="text-slate-600">
+                <strong className="text-slate-900 tabular-nums">{answeredCount}</strong> of <strong className="text-slate-900 tabular-nums">{totalQuestions}</strong> questions answered
+              </span>
+              <span className="text-slate-300 hidden sm:inline">·</span>
+              <span className="text-slate-500 hidden sm:inline">
+                {totalQuestions - answeredCount > 0 ? `${totalQuestions - answeredCount} remaining` : 'All answered!'}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Outer Track */}
+              <div
+                className="flex-1 sm:w-56 bg-slate-200 rounded-full h-3 overflow-hidden p-0.5"
+                role="progressbar"
+                aria-valuenow={progressPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Assessment completion progress"
+              >
+                <div
+                  className="bg-[#0E5C63] h-full rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="font-bold text-[#0E5C63] font-mono tabular-nums text-xs shrink-0 min-w-[3rem] text-right">
+                {progressPercent}%
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -378,6 +407,24 @@ export const ExamPage: React.FC<ExamPageProps> = ({
                   <X className="w-5 h-5" />
                 </button>
               )}
+            </div>
+
+            {/* Palette Completion Progress Indicator */}
+            <div className="space-y-1.5 pb-3 border-b border-slate-100">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-slate-700">Completion</span>
+                <span className="font-bold text-[#0E5C63] font-mono tabular-nums">{progressPercent}%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                <div
+                  className="bg-[#0E5C63] h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-slate-500 font-medium">
+                <span>{answeredCount} answered</span>
+                <span>{totalQuestions - answeredCount} remaining</span>
+              </div>
             </div>
 
             {/* Legend */}
