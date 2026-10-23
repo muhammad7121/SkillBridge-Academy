@@ -37,7 +37,15 @@ export const ExamPage: React.FC<ExamPageProps> = ({
   });
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showPaletteMobile, setShowPaletteMobile] = useState(false);
+  const [showFiveMinuteWarning, setShowFiveMinuteWarning] = useState(false);
+  const [isSubmittingAuto, setIsSubmittingAuto] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const hasTriggeredFiveMinWarning = useRef(false);
+  const attemptRef = useRef<ExamAttempt>(attempt);
+
+  useEffect(() => {
+    attemptRef.current = attempt;
+  }, [attempt]);
 
   const currentQuestion: ExamQuestion = attempt.questions[currentIndex];
   const totalQuestions = attempt.questions.length;
@@ -45,10 +53,25 @@ export const ExamPage: React.FC<ExamPageProps> = ({
   const isFlagged = attempt.flaggedQuestionIds.includes(currentQuestion.id);
   const selectedOption = attempt.answers[currentQuestion.id];
 
-  // Timer interval
+  const handleAutoSubmit = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setIsSubmittingAuto(true);
+    setTimeout(() => {
+      const graded = gradeAttempt(attemptRef.current);
+      onFinishExam(graded);
+    }, 800);
+  };
+
+  // Timer interval with 5-minute warning check
   useEffect(() => {
     timerRef.current = window.setInterval(() => {
       setSecondsRemaining((prev) => {
+        // Trigger 5-minute warning when passing 300 seconds (5:00)
+        if (prev <= 300 && !hasTriggeredFiveMinWarning.current && prev > 1) {
+          hasTriggeredFiveMinWarning.current = true;
+          setShowFiveMinuteWarning(true);
+        }
+
         if (prev <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
           handleAutoSubmit();
@@ -62,11 +85,6 @@ export const ExamPage: React.FC<ExamPageProps> = ({
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
-
-  const handleAutoSubmit = () => {
-    const graded = gradeAttempt(attempt);
-    onFinishExam(graded);
-  };
 
   const handleSelectOption = (optionKey: 'A' | 'B' | 'C' | 'D') => {
     const updatedAnswers = {
@@ -196,6 +214,25 @@ export const ExamPage: React.FC<ExamPageProps> = ({
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col lg:flex-row gap-6">
         {/* Left Column: Active Question Workspace */}
         <div className="flex-1 flex flex-col space-y-4">
+          {/* 5-Minute Warning Persistent Banner */}
+          {isLowTime && (
+            <div
+              role="alert"
+              className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs animate-in fade-in duration-200"
+            >
+              <div className="flex items-center gap-2.5">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                <div>
+                  <span className="font-bold">5-Minute Time Warning:</span>{' '}
+                  <span>You have less than 5 minutes remaining. When the timer reaches <strong>00:00</strong>, your exam will auto-submit.</span>
+                </div>
+              </div>
+              <span className="font-mono font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md text-xs tabular-nums shrink-0">
+                {formatTimeRemaining(secondsRemaining)}
+              </span>
+            </div>
+          )}
+
           <div className="bg-white rounded-xl shadow-xs border border-slate-200 p-6 sm:p-8 flex-1 flex flex-col justify-between">
             <div>
               {/* Question Meta Header */}
@@ -480,6 +517,71 @@ export const ExamPage: React.FC<ExamPageProps> = ({
               >
                 Confirm & Submit
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5-Minute Warning Popup Modal */}
+      {showFiveMinuteWarning && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 border-2 border-amber-400 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3">
+              <div className="p-3 rounded-full bg-amber-100 text-amber-700 shrink-0">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-slate-900">
+                  5 Minutes Remaining!
+                </h3>
+                <p className="text-xs text-slate-600">
+                  You have less than 5 minutes left in this examination.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1.5">
+              <div className="flex justify-between font-bold">
+                <span>Time Left:</span>
+                <span className="font-mono tabular-nums text-amber-800 text-sm">
+                  {formatTimeRemaining(secondsRemaining)}
+                </span>
+              </div>
+              <p>
+                When the timer hits <strong>00:00</strong>, your exam will <strong>automatically submit</strong>. Please review any unanswered or flagged questions now.
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowFiveMinuteWarning(false)}
+                className="px-5 py-2.5 bg-[#0E5C63] hover:bg-[#093E43] text-white rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+              >
+                Understood, Return to Exam
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auto-Submitting When Time Expires Overlay */}
+      {isSubmittingAuto && (
+        <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto animate-pulse">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-slate-900">
+                Time Expired!
+              </h3>
+              <p className="text-xs text-slate-600">
+                The 60-minute examination period has ended. Automatically finalizing and recording your assessment results...
+              </p>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div className="bg-[#0E5C63] h-1.5 rounded-full animate-pulse w-full" />
             </div>
           </div>
         </div>
