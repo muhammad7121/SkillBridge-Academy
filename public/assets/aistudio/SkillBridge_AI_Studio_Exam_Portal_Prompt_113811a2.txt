@@ -1,0 +1,98 @@
+Build a complete web-based online exam portal for SkillBridge Academy that students can use from anywhere (remote and on-campus).
+
+APP NAME
+SkillBridge Systems Admin Exam Portal
+
+PURPOSE
+Host a timed objective (multiple-choice) exam for the Systems & Network Administration programme, covering Weeks 1–4 only (Systems Administration). Some students sit the exam remotely, so the app must run fully in the browser — no software install for students, works on laptop and phone.
+
+BRANDING
+- Academy: SkillBridge Academy
+- Tagline: Building Skills. Creating Opportunities.
+- Exam title: Systems Administration Assessment (Weeks 1–4)
+- Colours: primary teal #0E5C63, accent gold #D4A017, background #F5F7F8, text #1A1A1A
+- Footer: A Social Enterprise Initiative of PTDS · Kano, Nigeria
+
+LOGIN (no password for this cohort)
+Students log in with EITHER:
+1. Student ID (exact match, ignore case), OR
+2. Full Name (exact match after trim, ignore case)
+
+Only these 12 students may log in. Reject anything else with a clear error message.
+
+Student register (use exactly):
+SBA-C1-SNA-2026-001 | Muhd Arab Lamido | muhdarablamido@gmail.com
+SBA-C1-SNA-2026-002 | Adamu Muhammad Gidado | gidadoadamu3@gmail.com
+SBA-C1-SNA-2026-003 | Ahmad Musa Ahmad | comradeahmadmusaimam@gmail.com
+SBA-C1-SNA-2026-004 | Abdurrashid Abdullahi Sani | saniabdurrashid2838@gmail.com
+SBA-C1-SNA-2026-005 | Aliyu Isah Baba | aliyuisahbaba2018@gmail.com
+SBA-C1-SNA-2026-006 | Oche Perfect Ikwulono | ocheperfect@outlook.com
+SBA-C1-SNA-2026-007 | Adamu Abdullahi | (no email)
+SBA-C1-SNA-2026-008 | Halim Adinoyi Abdullahi | halimadinoyi@gmail.com
+SBA-C1-SNA-2026-009 | Mukhtar Ibrahim | mukhtaribro@gmail.com
+SBA-C1-SNA-2026-010 | Muhammad Salisu | mohsalis99@gmail.com
+SBA-C1-SNA-2026-011 | Abdulrahman Salihi Suleiman | asaleehi@gmail.com
+SBA-C1-SNA-2026-012 | Abdullahi Said Abdulkadir | mujaysaid@gmail.com
+
+After login show: Welcome, [Full Name] — Student ID: [ID]
+
+REMOTE EXAM REQUIREMENTS (important)
+- Fully browser-based so remote students need only a link
+- Mobile-friendly layout
+- Stable on slow connections where possible
+- Clear instructions before the timer starts
+- Visible countdown timer; auto-submit when time ends
+- Confirm before final submit
+- One attempt per student by default (block second attempt)
+- Save answers as they go so a refresh does not wipe progress if possible
+- After submit show score, pass/fail, and optional review of correct answers
+
+EXAM RULES (defaults)
+- 40 questions randomly selected from the question bank (balanced across weeks if possible)
+- 60 minutes time limit
+- Pass mark: 50%
+- Multiple choice only (A B C D), one correct answer each
+- Allow next/previous navigation within the attempt
+- Shuffle question order per attempt
+
+EXAM SCOPE
+Only Weeks 1–4 Systems Administration topics:
+Week 1: IT infrastructure roles, hardware, cabling, asset registers, support tickets, physical-layer troubleshooting, lab safety
+Week 2: Windows 11 deployment, local accounts, least privilege, build records, controlled shares
+Week 3: VirtualBox lab network 192.168.10.0/24, DC01 192.168.10.10, domain skillbridge.local, AD DS, DNS, DHCP 192.168.10.100–200, domain join, LabShare, snapshots
+Week 4: Ubuntu Server lnx01 192.168.10.20, Netplan, SSH/PuTTY, apt, users/permissions, nginx, UFW, fstab, cron, snapshots
+
+Do NOT include Weeks 5–8 pure networking exam content.
+
+PAGES TO BUILD
+1) Login page — single field “Student ID or Full Name”, Start button, short help text
+2) Instructions page — scope, time, rules, number of questions, remote integrity note (“Work alone. Do not share answers.”), Start Assessment button that starts the timer
+3) Exam page — name, ID, timer, progress, questions with radio options, Previous/Next, Submit
+4) Results page — score %, pass or not yet competent, breakdown optional, review if enabled, Logout
+5) Simple instructor view (optional password “skillbridge-admin”) — list of who sat the exam, scores, dates; export or copy results
+
+QUESTION BANK
+Embed at least 40–60 solid multiple-choice questions covering Weeks 1–4. Examples of correct lab facts to use:
+- Switch forwards by MAC; router by IP
+- DC01 = 192.168.10.10; domain = skillbridge.local
+- VirtualBox Host-Only DHCP must be OFF so Windows Server DHCP works
+- APIPA 169.254.x.x means DHCP failed
+- Client DNS must be 192.168.10.10 before domain join
+- LNX01 = 192.168.10.20; Netplan for Ubuntu network config
+- Least privilege; asset register fields; physical-layer-first checks
+Each question: id, week (1-4), question text, 4 options A–D, correct letter, short explanation
+
+DATA
+Persist students, questions, and attempts (local storage or simple backend is fine for v1). Prevent retake after submit unless instructor resets.
+
+UI / UX
+Clean, professional, high contrast, large touch targets for phones. Show errors clearly. Do not show other students’ results to a student.
+
+INTEGRITY NOTE FOR REMOTE SITTINGS
+On the instructions page include:
+“This assessment may be taken on campus or remotely. Work independently. Do not share questions or answers. Your attempt is recorded against your Student ID.”
+
+DELIVERABLE
+A working web app I can open in a browser and share as a link with remote students. Include all 12 students ready to log in and a full usable question set so the exam can run immediately.
+
+Build the complete application now.

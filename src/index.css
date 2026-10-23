@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --primary-teal: #0E5C63;
+  --primary-teal-dark: #093E43;
+  --primary-teal-light: #E7F2F3;
+  --accent-gold: #D4A017;
+  --accent-gold-dark: #A57C0E;
+  --accent-gold-light: #FBF4DE;
+  --app-bg: #F5F7F8;
+  --app-text: #1A1A1A;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+}

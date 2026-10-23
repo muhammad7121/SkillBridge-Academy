@@ -1,0 +1,7 @@
+{
+  "name": "SkillBridge Systems Admin Exam Portal",
+  "description": "Online assessment portal for SkillBridge Academy Systems & Network Administration students (Weeks 1–4 Assessment).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
