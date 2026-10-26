@@ -3,8 +3,8 @@ import { ExamAttempt, ExamQuestion } from '../types/exam';
 import {
   saveStudentAttempt,
   formatTimeRemaining,
-  gradeAttempt,
 } from '../utils/examEngine';
+import { submitAttempt, saveAttemptProgress } from '../utils/api';
 import {
   Clock,
   Flag,
@@ -57,10 +57,31 @@ export const ExamPage: React.FC<ExamPageProps> = ({
   const handleAutoSubmit = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     setIsSubmittingAuto(true);
-    setTimeout(() => {
-      const graded = gradeAttempt(attemptRef.current);
-      onFinishExam(graded);
-    }, 800);
+    finalizeSubmission();
+  };
+
+  const isSubmittingRef = useRef(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Saves and grades on the server; only reports success once the result is stored.
+  const finalizeSubmission = async () => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setSubmitError(null);
+    try {
+      const saved = await submitAttempt(attemptRef.current);
+      saveStudentAttempt(saved);
+      onFinishExam(saved);
+    } catch (err) {
+      console.error('Exam submission failed:', err);
+      setIsSubmittingAuto(false);
+      setSubmitError(
+        (err instanceof Error ? err.message : 'Submission failed.') +
+          ' Your answers are still saved on this device — please try submitting again.'
+      );
+    } finally {
+      isSubmittingRef.current = false;
+    }
   };
 
   // Timer interval with 5-minute warning check
@@ -98,6 +119,7 @@ export const ExamPage: React.FC<ExamPageProps> = ({
     };
     setAttempt(updatedAttempt);
     saveStudentAttempt(updatedAttempt);
+    saveAttemptProgress(updatedAttempt).catch((err) => console.warn('Autosave failed:', err));
   };
 
   const handleToggleFlag = () => {
@@ -113,6 +135,7 @@ export const ExamPage: React.FC<ExamPageProps> = ({
     };
     setAttempt(updatedAttempt);
     saveStudentAttempt(updatedAttempt);
+    saveAttemptProgress(updatedAttempt).catch((err) => console.warn('Autosave failed:', err));
   };
 
   const handleNext = () => {
@@ -135,8 +158,7 @@ export const ExamPage: React.FC<ExamPageProps> = ({
   const handleConfirmSubmit = () => {
     setShowSubmitModal(false);
     if (timerRef.current) clearInterval(timerRef.current);
-    const graded = gradeAttempt(attempt);
-    onFinishExam(graded);
+    finalizeSubmission();
   };
 
   const isLowTime = secondsRemaining <= 300; // Under 5 minutes
@@ -494,6 +516,17 @@ export const ExamPage: React.FC<ExamPageProps> = ({
           </div>
         </aside>
       </div>
+
+      {submitError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[calc(100%-2rem)] p-4 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs sm:text-sm shadow-lg flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 shrink-0" />
+          <div className="flex-1">
+            <strong className="block">Submission not saved</strong>
+            <span>{submitError}</span>
+          </div>
+          <button onClick={finalizeSubmission} className="px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-semibold">Retry</button>
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {showSubmitModal && (

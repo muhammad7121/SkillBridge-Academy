@@ -19,9 +19,10 @@ import {
 interface ResultsPageProps {
   attempt: ExamAttempt;
   onLogout: () => void;
+  justSubmitted?: boolean;
 }
 
-export const ResultsPage: React.FC<ResultsPageProps> = ({ attempt, onLogout }) => {
+export const ResultsPage: React.FC<ResultsPageProps> = ({ attempt, onLogout, justSubmitted = false }) => {
   const [showReview, setShowReview] = useState(false);
   const [filterWeek, setFilterWeek] = useState<number | 'all'>('all');
 
@@ -49,6 +50,13 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ attempt, onLogout }) =
 
   return (
     <div className="flex-1 max-w-4xl mx-auto px-4 py-8 sm:py-10 space-y-6">
+      {justSubmitted && attempt.serverSaved && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span>Your assessment was submitted and your result has been saved. Your instructor can now see it.</span>
+        </div>
+      )}
+
       {/* Assessment Final Score Card */}
       <div className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
         {/* Banner with Result State */}
