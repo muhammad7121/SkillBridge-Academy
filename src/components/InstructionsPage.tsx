@@ -7,6 +7,8 @@ interface InstructionsPageProps {
   existingAttempt: ExamAttempt | null;
   onStartExam: () => void;
   onViewResults: () => void;
+  isStarting?: boolean;
+  startError?: string | null;
 }
 
 export const InstructionsPage: React.FC<InstructionsPageProps> = ({
@@ -14,6 +16,8 @@ export const InstructionsPage: React.FC<InstructionsPageProps> = ({
   existingAttempt,
   onStartExam,
   onViewResults,
+  isStarting = false,
+  startError = null,
 }) => {
   const isAlreadySubmitted = existingAttempt?.submitted === true;
   const isInProgress = existingAttempt && !existingAttempt.submitted;
@@ -178,8 +182,10 @@ export const InstructionsPage: React.FC<InstructionsPageProps> = ({
                 ? 'An assessment attempt is already started. You may resume where you left off.'
                 : 'Click below to initiate your 60-minute assessment countdown.'}
             </div>
+            {startError && <p className="text-xs text-rose-700">{startError}</p>}
             <button
               onClick={onStartExam}
+              disabled={isStarting}
               className="w-full sm:w-auto px-6 py-3.5 bg-[#0E5C63] hover:bg-[#093E43] active:bg-[#072F33] text-white font-semibold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base shrink-0"
             >
               <span>{isInProgress ? 'Resume Assessment' : 'Start Assessment'}</span>

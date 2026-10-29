@@ -58,7 +58,7 @@ export const InstructorView: React.FC<InstructorViewProps> = ({ onBackToPortal }
   };
 
   const handleDownloadCSV = () => {
-    const csv = generateResultsCSV();
+    const csv = generateResultsCSV(attempts);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');

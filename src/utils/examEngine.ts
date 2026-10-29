@@ -1,4 +1,6 @@
 import { ExamAttempt, ExamQuestion, Student } from '../types/exam';
+// Attempts are created and graded by the server (netlify/functions/attempts.mts).
+// localStorage here only caches the candidate's in-browser copy for resilience.
 import { QUESTION_BANK } from '../data/questionsBank';
 import { REGISTERED_STUDENTS } from '../data/students';
 
@@ -117,63 +119,6 @@ export function getCurrentStudentSession(): Student | null {
   }
 }
 
-/**
- * Creates a fresh attempt for a student.
- */
-export function createNewAttempt(student: Student): ExamAttempt {
-  const questions = generateBalancedExamQuestions();
-  const attempt: ExamAttempt = {
-    id: `ATTEMPT-${student.id}-${Date.now()}`,
-    studentId: student.id,
-    studentName: student.name,
-    studentEmail: student.email,
-    startTime: Date.now(),
-    durationSeconds: 60 * 60, // 60 minutes
-    questions,
-    answers: {},
-    flaggedQuestionIds: [],
-    submitted: false,
-    totalQuestions: questions.length,
-  };
-  saveStudentAttempt(attempt);
-  return attempt;
-}
-
-/**
- * Evaluates and grades an attempt.
- */
-export function gradeAttempt(attempt: ExamAttempt): ExamAttempt {
-  let score = 0;
-  attempt.questions.forEach((q) => {
-    if (attempt.answers[q.id] === q.correct) {
-      score += 1;
-    }
-  });
-
-  const total = attempt.questions.length;
-  const percentage = Math.round((score / total) * 100);
-  const passed = percentage >= 50;
-  const now = Date.now();
-  const timeSpentSeconds = Math.min(
-    attempt.durationSeconds,
-    Math.round((now - attempt.startTime) / 1000)
-  );
-
-  const graded: ExamAttempt = {
-    ...attempt,
-    submitted: true,
-    score,
-    totalQuestions: total,
-    percentage,
-    passed,
-    submittedAt: new Date().toISOString(),
-    timeSpentSeconds,
-  };
-
-  saveStudentAttempt(graded);
-  return graded;
-}
-
 export interface WeekPerformance {
   week: number;
   label: string;
@@ -236,12 +181,12 @@ export function formatTimeRemaining(seconds: number): string {
 /**
  * Generates CSV string of all 12 student records and their current exam status
  */
-export function generateResultsCSV(): string {
-  const attempts = getAllAttempts();
+export function generateResultsCSV(attempts: Record<string, ExamAttempt>): string {
   const headers = [
     'Student ID',
     'Full Name',
     'Email',
+    'Exam',
     'Status',
     'Score',
     'Total',
@@ -258,6 +203,7 @@ export function generateResultsCSV(): string {
         student.id,
         `"${student.name}"`,
         student.email || 'N/A',
+        '-',
         'Not Started',
         '-',
         '-',
@@ -274,6 +220,7 @@ export function generateResultsCSV(): string {
         student.id,
         `"${student.name}"`,
         student.email || 'N/A',
+        `"${attempt.examTitle ?? ''}"`,
         `In Progress (${answeredCount}/${attempt.totalQuestions} answered)`,
         '-',
         attempt.totalQuestions,
@@ -292,6 +239,7 @@ export function generateResultsCSV(): string {
       student.id,
       `"${student.name}"`,
       student.email || 'N/A',
+      `"${attempt.examTitle ?? ''}"`,
       'Completed',
       attempt.score ?? 0,
       attempt.totalQuestions,

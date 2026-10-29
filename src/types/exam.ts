@@ -35,6 +35,8 @@ export interface ExamAttempt {
   studentId: string;
   studentName: string;
   studentEmail: string;
+  examId?: string;
+  examTitle?: string;
   startTime: number; // ms timestamp
   durationSeconds: number; // 3600 (60 mins)
   questions: ExamQuestion[];
@@ -47,6 +49,8 @@ export interface ExamAttempt {
   passed?: boolean;
   submittedAt?: string;
   timeSpentSeconds?: number;
+  /** True once the server has confirmed this attempt is stored in the database. */
+  serverSaved?: boolean;
 }
 
 export type AppView = 'login' | 'instructions' | 'exam' | 'results' | 'instructor';
